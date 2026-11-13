@@ -1,0 +1,6 @@
+{
+  "name": "SitterSG",
+  "description": "Trusted, Singpass-verified babysitting marketplace for Singapore families across Punggol, Sengkang, and Tampines.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
