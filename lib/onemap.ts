@@ -172,19 +172,34 @@ export async function lookupSingaporePostal(rawPostalInput: string): Promise<{
     const blkNo = match.BLK_NO && match.BLK_NO !== 'NIL' ? match.BLK_NO : '';
     const roadName = match.ROAD_NAME && match.ROAD_NAME !== 'NIL' ? match.ROAD_NAME : '';
 
+    const parsedLat = Number(match.LATITUDE);
+    const parsedLng = Number(match.LONGITUDE);
+    const hasValidSgCoords =
+      Boolean(match.LATITUDE) &&
+      Boolean(match.LONGITUDE) &&
+      Number.isFinite(parsedLat) &&
+      Number.isFinite(parsedLng) &&
+      parsedLat > 1.1 &&
+      parsedLat < 1.55 &&
+      parsedLng > 103.55 &&
+      parsedLng < 104.15;
+    const fallback = buildFallbackLocation(rawPostal, 'Missing coordinates');
+    const resolvedPostal =
+      match.POSTAL && /^\d{6}$/.test(match.POSTAL) ? match.POSTAL : rawPostal;
+
     return {
       status: 200,
       body: {
         source: 'onemap',
-        postalCode: match.POSTAL || rawPostal,
+        postalCode: resolvedPostal,
         estateLabel,
         address,
         blkNo,
         roadName,
         building,
         nearestMrt: `${estateLabel} area`,
-        lat: Number(match.LATITUDE),
-        lng: Number(match.LONGITUDE),
+        lat: hasValidSgCoords ? parsedLat : fallback.lat,
+        lng: hasValidSgCoords ? parsedLng : fallback.lng,
       },
     };
   } catch {

@@ -58,17 +58,43 @@ export class MockMyInfoService implements MyInfoService {
   }
 }
 
-const SECTOR_COORDS: Record<string, { lat: number; lng: number; estateLabel: string }> = {
-  '82': { lat: 1.4043, lng: 103.9025, estateLabel: 'Punggol' },
-  '54': { lat: 1.3917, lng: 103.8954, estateLabel: 'Sengkang' },
-  '53': { lat: 1.383, lng: 103.8931, estateLabel: 'Sengkang' },
-  '79': { lat: 1.3918, lng: 103.8763, estateLabel: 'Sengkang' },
-  '52': { lat: 1.3526, lng: 103.9447, estateLabel: 'Tampines' },
-  '51': { lat: 1.3721, lng: 103.9474, estateLabel: 'Pasir Ris / Tampines' },
+const SITTER_POSTAL_COORDS: Record<string, { lat: number; lng: number }> = {
+  '822218': { lat: 1.4048, lng: 103.9029 },
+  '823168': { lat: 1.3969, lng: 103.9089 },
+  '821308': { lat: 1.4084, lng: 103.8986 },
+  '820105': { lat: 1.3994, lng: 103.9058 },
+  '828674': { lat: 1.4118, lng: 103.9003 },
+  '822256': { lat: 1.4052, lng: 103.8975 },
+  '828910': { lat: 1.4096, lng: 103.9048 },
+  '828710': { lat: 1.4169, lng: 103.9066 },
+  '542282': { lat: 1.3945, lng: 103.9005 },
+  '544260': { lat: 1.3917, lng: 103.8954 },
+  '792416': { lat: 1.3918, lng: 103.8763 },
+  '530312': { lat: 1.383, lng: 103.8931 },
+  '541201': { lat: 1.3842, lng: 103.8973 },
+  '544180': { lat: 1.3921, lng: 103.88 },
+  '520489': { lat: 1.354, lng: 103.9452 },
+  '521842': { lat: 1.3455, lng: 103.9384 },
+  '521265': { lat: 1.3562, lng: 103.9546 },
+  '520144': { lat: 1.3432, lng: 103.9534 },
+  '529502': { lat: 1.3526, lng: 103.9447 },
+  '522610': { lat: 1.3625, lng: 103.939 },
+};
+
+const SECTOR_COORDS: Record<string, { lat: number; lng: number }> = {
+  '82': { lat: 1.4043, lng: 103.9025 },
+  '54': { lat: 1.3917, lng: 103.8954 },
+  '53': { lat: 1.383, lng: 103.8931 },
+  '79': { lat: 1.3918, lng: 103.8763 },
+  '52': { lat: 1.3526, lng: 103.9447 },
+  '51': { lat: 1.3721, lng: 103.9474 },
 };
 
 function postalToApproxCoords(postal: string): { lat: number; lng: number } {
   const cleaned = postal.replace(/\D/g, '');
+  if (SITTER_POSTAL_COORDS[cleaned]) {
+    return SITTER_POSTAL_COORDS[cleaned];
+  }
   const base = SECTOR_COORDS[cleaned.slice(0, 2)] ?? { lat: 1.3521, lng: 103.8198 };
   const jitter = ((parseInt(cleaned.slice(-2) || '15', 10) % 10) - 5) * 0.0014;
   return { lat: base.lat + jitter, lng: base.lng + jitter };
@@ -111,13 +137,20 @@ export class OneMapApiService implements OneMapService {
     const cleanedFrom = fromPostal.replace(/\D/g, '');
     if (cleanedFrom && cleanedFrom === cleanedTo) return 0.1;
 
-    const origin =
-      typeof from === 'object' && from.lat !== undefined && from.lng !== undefined
-        ? { lat: from.lat, lng: from.lng }
-        : postalToApproxCoords(cleanedFrom || '822215');
+    const hasValidCoords =
+      typeof from === 'object' &&
+      typeof from.lat === 'number' &&
+      Number.isFinite(from.lat) &&
+      typeof from.lng === 'number' &&
+      Number.isFinite(from.lng);
+
+    const origin = hasValidCoords
+      ? { lat: from.lat as number, lng: from.lng as number }
+      : postalToApproxCoords(cleanedFrom || '822215');
 
     const dest = postalToApproxCoords(cleanedTo || '822218');
-    return Math.max(0.2, haversineKm(origin.lat, origin.lng, dest.lat, dest.lng));
+    const dist = haversineKm(origin.lat, origin.lng, dest.lat, dest.lng);
+    return Number.isFinite(dist) ? Math.max(0.2, dist) : 1.5;
   }
 }
 

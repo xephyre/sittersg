@@ -231,7 +231,8 @@ export const DiscoverFilters: React.FC<DiscoverFiltersProps> = ({
         className="min-h-[40px] px-3 rounded-xl border border-slate-300 text-xs font-medium bg-white"
       >
         <option value={3}>Within 3 km</option>
-        <option value={6}>Within 6 km</option>
+        <option value={5}>Within 5 km</option>
+        <option value={10}>Within 10 km</option>
         <option value={999}>All beta estates</option>
       </select>
     </div>

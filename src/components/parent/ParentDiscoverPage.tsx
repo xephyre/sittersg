@@ -14,7 +14,9 @@ export const ParentDiscoverPage: React.FC = () => {
   const { state, activeParent, setActiveTab, setSingpassModalOpen, setRebookSitterId } = useApp();
 
   const [postalInput, setPostalInput] = useState(activeParent.postalCode);
-  const [resolvedLocation, setResolvedLocation] = useState<GeocodedLocation | null>(null);
+  const [resolvedLocation, setResolvedLocation] = useState<
+    (GeocodedLocation & { queriedPostal?: string }) | null
+  >(null);
   const [lookupLoading, setLookupLoading] = useState(false);
   const [lookupError, setLookupError] = useState<string | null>(null);
 
@@ -25,7 +27,7 @@ export const ParentDiscoverPage: React.FC = () => {
   const [minRating, setMinRating] = useState(4.5);
   const [availableTodayOnly, setAvailableTodayOnly] = useState(false);
   const [specialFilter, setSpecialFilter] = useState<'none' | 'newborn' | 'special_needs'>('none');
-  const [maxDistanceKm, setMaxDistanceKm] = useState(999);
+  const [maxDistanceKm, setMaxDistanceKm] = useState(5);
 
   const [detailSitter, setDetailSitter] = useState<Sitter | null>(null);
   const [checkoutTarget, setCheckoutTarget] = useState<{
@@ -44,7 +46,7 @@ export const ParentDiscoverPage: React.FC = () => {
     setLookupError(null);
     try {
       const loc = await oneMapService.geocodePostalCode(cleaned);
-      setResolvedLocation(loc);
+      setResolvedLocation({ ...loc, queriedPostal: cleaned });
     } catch (err) {
       setLookupError(err instanceof Error ? err.message : 'Unable to resolve postal code.');
     } finally {
@@ -72,13 +74,21 @@ export const ParentDiscoverPage: React.FC = () => {
     }
   }, [state.rebookSitterId, state.sitters, setRebookSitterId]);
 
-  const originForDistance = useMemo(
-    () =>
-      resolvedLocation
-        ? { postalCode: resolvedLocation.postalCode, lat: resolvedLocation.lat, lng: resolvedLocation.lng }
-        : postalInput,
-    [resolvedLocation, postalInput]
+  const isResolvedForCurrentPostal = Boolean(
+    resolvedLocation &&
+      (resolvedLocation.queriedPostal === postalInput || resolvedLocation.postalCode === postalInput)
   );
+
+  const originForDistance = useMemo(() => {
+    if (isResolvedForCurrentPostal && resolvedLocation) {
+      return {
+        postalCode: postalInput || resolvedLocation.postalCode,
+        lat: resolvedLocation.lat,
+        lng: resolvedLocation.lng,
+      };
+    }
+    return postalInput;
+  }, [isResolvedForCurrentPostal, resolvedLocation, postalInput]);
 
   const approvedSitters = useMemo(() => {
     return state.sitters
@@ -95,7 +105,7 @@ export const ParentDiscoverPage: React.FC = () => {
         if (availableTodayOnly && !sitter.availableToday) return false;
         if (specialFilter === 'newborn' && !sitter.newbornCertified) return false;
         if (specialFilter === 'special_needs' && !sitter.specialNeedsTrained) return false;
-        if (distanceKm > maxDistanceKm) return false;
+        if (maxDistanceKm < 999 && distanceKm > maxDistanceKm) return false;
         if (selectedDate && !sitter.availability.some((a) => a.date === selectedDate)) return false;
         return true;
       })
@@ -223,34 +233,62 @@ export const ParentDiscoverPage: React.FC = () => {
       />
 
       <section className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="text-lg font-bold text-slate-900">
             Verified Sitters ({approvedSitters.length})
           </h2>
-          <p className="text-xs text-slate-500">Sorted by OneMap coordinate distance</p>
+          <p className="text-xs text-slate-500">
+            {lookupLoading
+              ? 'Refreshing sitters near your postal code...'
+              : `${
+                  maxDistanceKm < 999 ? `Within ${maxDistanceKm} km` : 'All beta estates'
+                } · Sorted by distance from ${
+                  isResolvedForCurrentPostal && resolvedLocation
+                    ? resolvedLocation.estateLabel
+                    : `S${postalInput || '822215'}`
+                }`}
+          </p>
         </div>
 
         {approvedSitters.length === 0 ? (
           <div className="rounded-2xl border border-slate-200 bg-white p-8 text-center space-y-3">
             <p className="text-base font-semibold text-slate-900">
-              No sitters match those exact filters right now.
+              No sitters found within {maxDistanceKm} km of{' '}
+              {(isResolvedForCurrentPostal && resolvedLocation?.address) ||
+                `Singapore ${postalInput}`}
+              .
             </p>
-            <button
-              type="button"
-              onClick={() => {
-                setServiceType('All');
-                setLanguage('All');
-                setMaxRate(30);
-                setMinRating(4.5);
-                setAvailableTodayOnly(false);
-                setSpecialFilter('none');
-                setMaxDistanceKm(999);
-                setSelectedDate('');
-              }}
-              className="min-h-[44px] px-4 py-2 rounded-xl bg-teal-700 text-white text-sm font-semibold"
-            >
-              Reset Filters
-            </button>
+            <p className="text-sm text-slate-600 max-w-lg mx-auto">
+              SitterSG’s closed beta currently operates in Punggol, Sengkang, and Tampines. Expand
+              your radius or reset filters to browse all 18 verified sitters by distance.
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+              {maxDistanceKm < 999 && (
+                <button
+                  type="button"
+                  onClick={() => setMaxDistanceKm(999)}
+                  className="min-h-[44px] px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold"
+                >
+                  Show All Beta Estates
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => {
+                  setServiceType('All');
+                  setLanguage('All');
+                  setMaxRate(30);
+                  setMinRating(4.5);
+                  setAvailableTodayOnly(false);
+                  setSpecialFilter('none');
+                  setMaxDistanceKm(5);
+                  setSelectedDate('');
+                }}
+                className="min-h-[44px] px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50"
+              >
+                Reset Filters
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
