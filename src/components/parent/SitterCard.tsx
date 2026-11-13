@@ -15,7 +15,7 @@ import { SitterAvatar } from '../common/SitterAvatar';
 
 interface SitterCardProps {
   sitter: Sitter;
-  distanceKm: number;
+  distanceKm?: number;
   onViewProfile: (sitter: Sitter) => void;
   onBook: (sitter: Sitter) => void;
 }
@@ -40,7 +40,9 @@ export const SitterCard: React.FC<SitterCardProps> = ({
           <p className="text-xs text-slate-500 mt-0.5 flex items-center gap-1">
             <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
             <span className="truncate">
-              {sitter.estate} · {distanceKm.toFixed(1)} km · {sitter.nearestMrt}
+              {sitter.estate}
+              {distanceKm !== undefined ? ` · ${distanceKm.toFixed(1)} km` : ''} ·{' '}
+              {sitter.nearestMrt}
             </span>
           </p>
           <p className="text-xs text-slate-600 mt-1 flex items-center gap-1.5">

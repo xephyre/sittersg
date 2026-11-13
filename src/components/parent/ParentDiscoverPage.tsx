@@ -22,7 +22,7 @@ import { SitterCard } from './SitterCard';
 export const ParentDiscoverPage: React.FC = () => {
   const { state, activeParent, setActiveTab, setSingpassModalOpen, setRebookSitterId } = useApp();
 
-  const [postalInput, setPostalInput] = useState(activeParent.postalCode);
+  const [postalInput, setPostalInput] = useState('');
   const [resolvedLocation, setResolvedLocation] = useState<
     (GeocodedLocation & { queriedPostal?: string }) | null
   >(null);
@@ -70,6 +70,8 @@ export const ParentDiscoverPage: React.FC = () => {
       }, 250);
       return () => clearTimeout(timer);
     }
+    setResolvedLocation(null);
+    setLookupError(null);
     return undefined;
   }, [postalInput, runPostalLookup]);
 
@@ -83,28 +85,34 @@ export const ParentDiscoverPage: React.FC = () => {
     }
   }, [state.rebookSitterId, state.sitters, setRebookSitterId]);
 
+  const hasPostalQuery = /^\d{6}$/.test(postalInput);
+
   const isResolvedForCurrentPostal = Boolean(
-    resolvedLocation &&
+    hasPostalQuery &&
+      resolvedLocation &&
       (resolvedLocation.queriedPostal === postalInput || resolvedLocation.postalCode === postalInput)
   );
 
   const originForDistance = useMemo(() => {
+    if (!hasPostalQuery) return null;
     if (isResolvedForCurrentPostal && resolvedLocation) {
       return {
-        postalCode: postalInput || resolvedLocation.postalCode,
+        postalCode: postalInput,
         lat: resolvedLocation.lat,
         lng: resolvedLocation.lng,
       };
     }
     return postalInput;
-  }, [isResolvedForCurrentPostal, resolvedLocation, postalInput]);
+  }, [hasPostalQuery, isResolvedForCurrentPostal, resolvedLocation, postalInput]);
 
   const approvedSitters = useMemo(() => {
-    return state.sitters
+    const mapped = state.sitters
       .filter((s) => s.verificationStatus === 'approved')
       .map((s) => ({
         sitter: s,
-        distanceKm: oneMapService.calculateDistanceKm(originForDistance, s.postalCode),
+        distanceKm: originForDistance
+          ? oneMapService.calculateDistanceKm(originForDistance, s.postalCode)
+          : undefined,
       }))
       .filter(({ sitter, distanceKm }) => {
         if (serviceType !== 'All' && !sitter.specialties.includes(serviceType)) return false;
@@ -114,11 +122,21 @@ export const ParentDiscoverPage: React.FC = () => {
         if (availableTodayOnly && !sitter.availableToday) return false;
         if (specialFilter === 'newborn' && !sitter.newbornCertified) return false;
         if (specialFilter === 'special_needs' && !sitter.specialNeedsTrained) return false;
-        if (maxDistanceKm < 999 && distanceKm > maxDistanceKm) return false;
+        if (
+          distanceKm !== undefined &&
+          maxDistanceKm < 999 &&
+          distanceKm > maxDistanceKm
+        ) {
+          return false;
+        }
         if (selectedDate && !sitter.availability.some((a) => a.date === selectedDate)) return false;
         return true;
-      })
-      .sort((a, b) => a.distanceKm - b.distanceKm);
+      });
+
+    if (originForDistance) {
+      mapped.sort((a, b) => (a.distanceKm ?? 0) - (b.distanceKm ?? 0));
+    }
+    return mapped;
   }, [
     state.sitters,
     originForDistance,
@@ -273,13 +291,15 @@ export const ParentDiscoverPage: React.FC = () => {
           <p className="text-xs text-slate-500">
             {lookupLoading
               ? 'Refreshing sitters near your postal code...'
-              : `${
-                  maxDistanceKm < 999 ? `Within ${maxDistanceKm} km` : 'All beta estates'
-                } · Sorted by distance from ${
-                  isResolvedForCurrentPostal && resolvedLocation
-                    ? resolvedLocation.estateLabel
-                    : `S${postalInput || '822215'}`
-                }`}
+              : !hasPostalQuery
+                ? 'All beta estates · Enter a 6-digit postal code to filter by distance'
+                : `${
+                    maxDistanceKm < 999 ? `Within ${maxDistanceKm} km` : 'All beta estates'
+                  } · Sorted by distance from ${
+                    isResolvedForCurrentPostal && resolvedLocation
+                      ? resolvedLocation.estateLabel
+                      : `S${postalInput}`
+                  }`}
           </p>
         </div>
 
@@ -289,17 +309,19 @@ export const ParentDiscoverPage: React.FC = () => {
               <MapPinOff className="w-5 h-5" />
             </div>
             <p className="text-base font-semibold text-slate-900">
-              No sitters found within {maxDistanceKm} km of{' '}
-              {(isResolvedForCurrentPostal && resolvedLocation?.address) ||
-                `Singapore ${postalInput}`}
-              .
+              {hasPostalQuery
+                ? `No sitters found within ${maxDistanceKm} km of ${
+                    (isResolvedForCurrentPostal && resolvedLocation?.address) ||
+                    `Singapore ${postalInput}`
+                  }.`
+                : 'No sitters match your current filter selection.'}
             </p>
             <p className="text-sm text-slate-600 max-w-lg mx-auto">
               SitterSG’s closed beta currently operates in Punggol, Sengkang, and Tampines. Expand
-              your radius or reset filters to browse all 18 verified sitters by distance.
+              your radius or reset filters to browse all 18 verified sitters.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
-              {maxDistanceKm < 999 && (
+              {hasPostalQuery && maxDistanceKm < 999 && (
                 <button
                   type="button"
                   onClick={() => setMaxDistanceKm(999)}
@@ -344,7 +366,7 @@ export const ParentDiscoverPage: React.FC = () => {
       <SitterDetailDrawer
         sitter={detailSitter}
         distanceKm={
-          detailSitter
+          detailSitter && originForDistance
             ? oneMapService.calculateDistanceKm(originForDistance, detailSitter.postalCode)
             : undefined
         }
