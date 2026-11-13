@@ -33,16 +33,15 @@ Use the **Parent | Sitter | Admin** switcher in the top header to explore all th
 
 ---
 
-## Mocked Service Layer (`/src/services`)
+## Service Layer (`/server.ts` & `/src/services`)
 
-All integrations implement clean TypeScript interfaces in `src/services/interfaces.ts` with mock implementations and `// TODO:` integration blueprints in `src/services/mockServices.ts`:
-
-- `SingpassAuthService` → Singpass OIDC/FAPI + NDI Sign API
-- `MyInfoService` → MyInfo v4 Person API (explicit PDPA consent gated)
-- `OneMapService` → Singapore SLA OneMap Search & postal sector geocoding
-- `PaymentService` → Stripe PaymentIntents (`paynow`, `card`) / HitPay SGQR escrow
-- `NotificationService` → WhatsApp Business Cloud API templates + FCM/APNs push
-- `StorageService` → `localStorage` persistence for the MVP demo
+- **`OneMapService` (`/api/onemap/search`)**: Express backend proxy (`server.ts`) authenticating with Singapore SLA OneMap (`/api/auth/post/getToken`) using server-side `ONEMAP_API_TOKEN` or `ONEMAP_API_EMAIL`/`ONEMAP_API_PASSWORD` secrets and querying `/api/common/elastic/search` for reverse address & WGS84 coordinate lookup, with a postal-sector fallback when credentials are not configured.
+- **Mocked Services (`src/services/mockServices.ts`)**: Clean TypeScript interfaces in `src/services/interfaces.ts` with `TODO` integration blueprints for:
+  - `SingpassAuthService` → Singpass OIDC/FAPI + NDI Sign API
+  - `MyInfoService` → MyInfo v4 Person API (explicit PDPA consent gated)
+  - `PaymentService` → Stripe PaymentIntents (`paynow`, `card`) / HitPay SGQR escrow
+  - `NotificationService` → WhatsApp Business Cloud API templates + FCM/APNs push
+  - `StorageService` → `localStorage` persistence for the MVP demo
 
 ---
 

@@ -29,15 +29,24 @@ export interface MyInfoService {
 
 export interface GeocodedLocation {
   postalCode: string;
-  estate: EstateArea;
+  estateLabel: string;
+  address: string;
+  blkNo?: string;
+  roadName?: string;
+  building?: string;
   nearestMrt: string;
   lat: number;
   lng: number;
+  source: 'onemap' | 'fallback';
+  fallbackReason?: string;
 }
 
 export interface OneMapService {
   geocodePostalCode(postalCode: string): Promise<GeocodedLocation>;
-  calculateDistanceKm(fromPostal: string, toPostal: string): number;
+  calculateDistanceKm(
+    from: string | { postalCode: string; lat?: number; lng?: number },
+    toPostal: string
+  ): number;
 }
 
 export interface PaymentIntentResult {

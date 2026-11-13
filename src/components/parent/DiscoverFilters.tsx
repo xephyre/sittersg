@@ -1,6 +1,7 @@
 import React from 'react';
-import { SlidersHorizontal } from 'lucide-react';
+import { MapPin, SlidersHorizontal } from 'lucide-react';
 import { ServiceType, SpokenLanguage } from '../../types';
+import { GeocodedLocation } from '../../services/interfaces';
 
 const SERVICE_OPTIONS: ('All' | ServiceType)[] = [
   'All',
@@ -18,7 +19,9 @@ const LANGUAGES: ('All' | SpokenLanguage)[] = ['All', 'English', 'Mandarin', 'Ma
 interface DiscoverFiltersProps {
   postalInput: string;
   setPostalInput: (v: string) => void;
-  geocodedLabel: string;
+  resolvedLocation: GeocodedLocation | null;
+  lookupLoading: boolean;
+  lookupError: string | null;
   onGeocode: () => void;
   serviceType: 'All' | ServiceType;
   setServiceType: (v: 'All' | ServiceType) => void;
@@ -41,7 +44,9 @@ interface DiscoverFiltersProps {
 export const DiscoverFilters: React.FC<DiscoverFiltersProps> = ({
   postalInput,
   setPostalInput,
-  geocodedLabel,
+  resolvedLocation,
+  lookupLoading,
+  lookupError,
   onGeocode,
   serviceType,
   setServiceType,
@@ -61,39 +66,64 @@ export const DiscoverFilters: React.FC<DiscoverFiltersProps> = ({
   setMaxDistanceKm,
 }) => (
   <section className="rounded-2xl border border-slate-200 bg-white p-5 space-y-4">
-    <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
       <div className="flex items-center gap-2">
         <SlidersHorizontal className="w-4 h-4 text-teal-700" />
         <h2 className="text-base font-bold text-slate-900">Search Verified Sitters Near You</h2>
       </div>
-      <p className="text-xs text-slate-500">
-        OneMap Distance from <span className="font-medium text-slate-800">{geocodedLabel}</span>
-      </p>
+      <div className="text-xs text-slate-600 flex items-center gap-1.5">
+        <MapPin className="w-3.5 h-3.5 text-teal-700 shrink-0" />
+        {lookupLoading ? (
+          <span>Looking up Singapore postal code via OneMap...</span>
+        ) : lookupError ? (
+          <span className="text-red-700 font-medium">{lookupError}</span>
+        ) : resolvedLocation ? (
+          <span>
+            <span className="font-medium text-slate-900">{resolvedLocation.address}</span>
+            {' · '}
+            <span className="text-slate-500">
+              {resolvedLocation.source === 'onemap'
+                ? 'OneMap Live'
+                : 'OneMap Fallback (set ONEMAP_API_TOKEN or ONEMAP_API_EMAIL in Secrets for live lookup)'}
+            </span>
+          </span>
+        ) : (
+          <span>Enter a 6-digit Singapore postal code</span>
+        )}
+      </div>
     </div>
 
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3">
-      <div className="lg:col-span-2">
-        <label className="block text-xs font-semibold text-slate-700 mb-1">
-          Singapore Postal Code
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          onGeocode();
+        }}
+        className="lg:col-span-2"
+      >
+        <label htmlFor="sg-postal-input" className="block text-xs font-semibold text-slate-700 mb-1">
+          Singapore Postal Code (OneMap Lookup)
         </label>
         <div className="flex gap-2">
           <input
+            id="sg-postal-input"
             type="text"
+            inputMode="numeric"
             maxLength={6}
             value={postalInput}
-            onChange={(e) => setPostalInput(e.target.value)}
+            onChange={(e) => setPostalInput(e.target.value.replace(/\D/g, '').slice(0, 6))}
             placeholder="e.g. 822215"
             className="flex-1 min-h-[44px] rounded-xl border border-slate-300 px-3 text-sm font-mono"
           />
           <button
-            type="button"
-            onClick={onGeocode}
-            className="min-h-[44px] px-3.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 whitespace-nowrap"
+            type="submit"
+            disabled={lookupLoading}
+            className="min-h-[44px] px-3.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 whitespace-nowrap"
           >
-            Locate
+            {lookupLoading ? 'Looking up...' : 'Locate'}
           </button>
         </div>
-      </div>
+      </form>
 
       <div>
         <label className="block text-xs font-semibold text-slate-700 mb-1">Service Type</label>
@@ -202,7 +232,7 @@ export const DiscoverFilters: React.FC<DiscoverFiltersProps> = ({
       >
         <option value={3}>Within 3 km</option>
         <option value={6}>Within 6 km</option>
-        <option value={10}>All beta estates</option>
+        <option value={999}>All beta estates</option>
       </select>
     </div>
   </section>

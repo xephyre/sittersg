@@ -1,7 +1,8 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { useApp } from '../../state/AppContext';
 import { oneMapService } from '../../services/mockServices';
+import { GeocodedLocation } from '../../services/interfaces';
 import { Booking, ServiceType, Sitter, SpokenLanguage } from '../../types';
 import { SitterAvatar } from '../common/SitterAvatar';
 import { SitterDetailDrawer } from './SitterDetailDrawer';
@@ -13,9 +14,10 @@ export const ParentDiscoverPage: React.FC = () => {
   const { state, activeParent, setActiveTab, setSingpassModalOpen, setRebookSitterId } = useApp();
 
   const [postalInput, setPostalInput] = useState(activeParent.postalCode);
-  const [geocodedLabel, setGeocodedLabel] = useState(
-    `${activeParent.estate} (${activeParent.postalCode})`
-  );
+  const [resolvedLocation, setResolvedLocation] = useState<GeocodedLocation | null>(null);
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupError, setLookupError] = useState<string | null>(null);
+
   const [selectedDate, setSelectedDate] = useState('');
   const [serviceType, setServiceType] = useState<'All' | ServiceType>('All');
   const [language, setLanguage] = useState<'All' | SpokenLanguage>('All');
@@ -23,7 +25,7 @@ export const ParentDiscoverPage: React.FC = () => {
   const [minRating, setMinRating] = useState(4.5);
   const [availableTodayOnly, setAvailableTodayOnly] = useState(false);
   const [specialFilter, setSpecialFilter] = useState<'none' | 'newborn' | 'special_needs'>('none');
-  const [maxDistanceKm, setMaxDistanceKm] = useState(10);
+  const [maxDistanceKm, setMaxDistanceKm] = useState(999);
 
   const [detailSitter, setDetailSitter] = useState<Sitter | null>(null);
   const [checkoutTarget, setCheckoutTarget] = useState<{
@@ -31,6 +33,34 @@ export const ParentDiscoverPage: React.FC = () => {
     date?: string;
     time?: string;
   } | null>(null);
+
+  const runPostalLookup = useCallback(async (postal: string) => {
+    const cleaned = postal.replace(/\D/g, '');
+    if (cleaned.length !== 6) {
+      setLookupError('Please enter a valid 6-digit Singapore postal code.');
+      return;
+    }
+    setLookupLoading(true);
+    setLookupError(null);
+    try {
+      const loc = await oneMapService.geocodePostalCode(cleaned);
+      setResolvedLocation(loc);
+    } catch (err) {
+      setLookupError(err instanceof Error ? err.message : 'Unable to resolve postal code.');
+    } finally {
+      setLookupLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (/^\d{6}$/.test(postalInput)) {
+      const timer = setTimeout(() => {
+        runPostalLookup(postalInput);
+      }, 250);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [postalInput, runPostalLookup]);
 
   useEffect(() => {
     if (state.rebookSitterId) {
@@ -42,17 +72,20 @@ export const ParentDiscoverPage: React.FC = () => {
     }
   }, [state.rebookSitterId, state.sitters, setRebookSitterId]);
 
-  const handleGeocode = async () => {
-    const loc = await oneMapService.geocodePostalCode(postalInput);
-    setGeocodedLabel(`${loc.estate} · ${loc.nearestMrt}`);
-  };
+  const originForDistance = useMemo(
+    () =>
+      resolvedLocation
+        ? { postalCode: resolvedLocation.postalCode, lat: resolvedLocation.lat, lng: resolvedLocation.lng }
+        : postalInput,
+    [resolvedLocation, postalInput]
+  );
 
   const approvedSitters = useMemo(() => {
     return state.sitters
       .filter((s) => s.verificationStatus === 'approved')
       .map((s) => ({
         sitter: s,
-        distanceKm: oneMapService.calculateDistanceKm(postalInput, s.postalCode),
+        distanceKm: oneMapService.calculateDistanceKm(originForDistance, s.postalCode),
       }))
       .filter(({ sitter, distanceKm }) => {
         if (serviceType !== 'All' && !sitter.specialties.includes(serviceType)) return false;
@@ -69,7 +102,7 @@ export const ParentDiscoverPage: React.FC = () => {
       .sort((a, b) => a.distanceKm - b.distanceKm);
   }, [
     state.sitters,
-    postalInput,
+    originForDistance,
     serviceType,
     language,
     maxRate,
@@ -167,8 +200,10 @@ export const ParentDiscoverPage: React.FC = () => {
       <DiscoverFilters
         postalInput={postalInput}
         setPostalInput={setPostalInput}
-        geocodedLabel={geocodedLabel}
-        onGeocode={handleGeocode}
+        resolvedLocation={resolvedLocation}
+        lookupLoading={lookupLoading}
+        lookupError={lookupError}
+        onGeocode={() => runPostalLookup(postalInput)}
         serviceType={serviceType}
         setServiceType={setServiceType}
         language={language}
@@ -192,7 +227,7 @@ export const ParentDiscoverPage: React.FC = () => {
           <h2 className="text-lg font-bold text-slate-900">
             Verified Sitters ({approvedSitters.length})
           </h2>
-          <p className="text-xs text-slate-500">Sorted by OneMap distance</p>
+          <p className="text-xs text-slate-500">Sorted by OneMap coordinate distance</p>
         </div>
 
         {approvedSitters.length === 0 ? (
@@ -209,7 +244,7 @@ export const ParentDiscoverPage: React.FC = () => {
                 setMinRating(4.5);
                 setAvailableTodayOnly(false);
                 setSpecialFilter('none');
-                setMaxDistanceKm(10);
+                setMaxDistanceKm(999);
                 setSelectedDate('');
               }}
               className="min-h-[44px] px-4 py-2 rounded-xl bg-teal-700 text-white text-sm font-semibold"
@@ -236,7 +271,7 @@ export const ParentDiscoverPage: React.FC = () => {
         sitter={detailSitter}
         distanceKm={
           detailSitter
-            ? oneMapService.calculateDistanceKm(postalInput, detailSitter.postalCode)
+            ? oneMapService.calculateDistanceKm(originForDistance, detailSitter.postalCode)
             : undefined
         }
         reviews={state.reviews}
