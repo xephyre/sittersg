@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, CheckCircle2, Copy, Crown, Gift } from 'lucide-react';
+import { ArrowRight, Calendar, CheckCircle2, Copy, Crown, Gift, Share2 } from 'lucide-react';
 import { useApp } from '../../state/AppContext';
 
 export const MembershipReferralPage: React.FC = () => {
@@ -43,22 +43,34 @@ export const MembershipReferralPage: React.FC = () => {
 
             <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl text-sm">
               <div className="p-3.5 flex items-center justify-between gap-3">
-                <span className="text-slate-700">Platform & insurance fee per booking</span>
-                <span className="font-mono font-semibold text-slate-900 tabular-nums">
+                <span className="text-slate-700 inline-flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-teal-700 shrink-0" />
+                  <span>Platform & insurance fee per booking</span>
+                </span>
+                <span className="font-mono font-semibold text-slate-900 tabular-nums shrink-0">
                   10% (vs 20% Standard)
                 </span>
               </div>
               <div className="p-3.5 flex items-center justify-between gap-3">
-                <span className="text-slate-700">Same-day emergency slot dispatch</span>
-                <span className="font-semibold text-teal-800">Priority queue</span>
+                <span className="text-slate-700 inline-flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-teal-700 shrink-0" />
+                  <span>Same-day emergency slot dispatch</span>
+                </span>
+                <span className="font-semibold text-teal-800 shrink-0">Priority queue</span>
               </div>
               <div className="p-3.5 flex items-center justify-between gap-3">
-                <span className="text-slate-700">June & Nov–Dec holiday care windows</span>
-                <span className="font-semibold text-slate-900">14-day early access</span>
+                <span className="text-slate-700 inline-flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-teal-700 shrink-0" />
+                  <span>June & Nov–Dec holiday care windows</span>
+                </span>
+                <span className="font-semibold text-slate-900 shrink-0">14-day early access</span>
               </div>
               <div className="p-3.5 flex items-center justify-between gap-3">
-                <span className="text-slate-700">Corporate HR childcare benefit receipts</span>
-                <span className="font-semibold text-slate-900">Included monthly</span>
+                <span className="text-slate-700 inline-flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-teal-700 shrink-0" />
+                  <span>Corporate HR childcare benefit receipts</span>
+                </span>
+                <span className="font-semibold text-slate-900 shrink-0">Included monthly</span>
               </div>
             </div>
           </div>
@@ -75,9 +87,10 @@ export const MembershipReferralPage: React.FC = () => {
             <button
               type="button"
               onClick={upgradeToPlus}
-              className="w-full min-h-[48px] px-5 py-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold transition-colors"
+              className="w-full min-h-[48px] px-5 py-3 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2"
             >
-              Upgrade to SitterSG Plus (Demo · S$29/mo)
+              <Crown className="w-4 h-4" />
+              <span>Upgrade to SitterSG Plus (Demo · S$29/mo)</span>
             </button>
           )}
         </section>
@@ -127,9 +140,10 @@ export const MembershipReferralPage: React.FC = () => {
           <button
             type="button"
             onClick={redeemReferralDemo}
-            className="w-full min-h-[48px] px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-900 text-sm font-semibold transition-colors"
+            className="w-full min-h-[48px] px-5 py-3 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-900 text-sm font-semibold transition-colors inline-flex items-center justify-center gap-2"
           >
-            Simulate Neighbour First Booking (+S$15 Credit)
+            <Share2 className="w-4 h-4 text-teal-700" />
+            <span>Simulate Neighbour First Booking (+S$15 Credit)</span>
           </button>
         </section>
       </div>
@@ -150,9 +164,10 @@ export const MembershipReferralPage: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('discover')}
-          className="min-h-[44px] px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold whitespace-nowrap shrink-0"
+          className="min-h-[44px] px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold whitespace-nowrap shrink-0 inline-flex items-center gap-1.5"
         >
-          Pre-Book Holiday Slot
+          <span>Pre-Book Holiday Slot</span>
+          <ArrowRight className="w-3.5 h-3.5" />
         </button>
       </section>
     </div>

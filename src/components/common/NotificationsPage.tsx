@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { Bell, CheckCheck, MessageCircle, Smartphone } from 'lucide-react';
+import {
+  AlertTriangle,
+  Bell,
+  Calendar,
+  Camera,
+  CheckCheck,
+  MessageCircle,
+  RotateCcw,
+  Smartphone,
+} from 'lucide-react';
 import { useApp } from '../../state/AppContext';
 
 export const NotificationsPage: React.FC = () => {
@@ -49,20 +58,24 @@ export const NotificationsPage: React.FC = () => {
       </div>
 
       <div className="flex items-center gap-2">
-        {(['all', 'WhatsApp', 'Push'] as const).map((ch) => (
-          <button
-            key={ch}
-            type="button"
-            onClick={() => setChannelFilter(ch)}
-            className={`min-h-[40px] px-4 py-1.5 rounded-xl border text-xs font-semibold transition-colors ${
-              channelFilter === ch
-                ? 'bg-teal-700 border-teal-700 text-white'
-                : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
-            }`}
-          >
-            {ch === 'all' ? 'All Channels' : ch}
-          </button>
-        ))}
+        {(['all', 'WhatsApp', 'Push'] as const).map((ch) => {
+          const ChannelIcon = ch === 'all' ? Bell : ch === 'WhatsApp' ? MessageCircle : Smartphone;
+          return (
+            <button
+              key={ch}
+              type="button"
+              onClick={() => setChannelFilter(ch)}
+              className={`min-h-[40px] px-4 py-1.5 rounded-xl border text-xs font-semibold transition-colors inline-flex items-center gap-1.5 ${
+                channelFilter === ch
+                  ? 'bg-teal-700 border-teal-700 text-white'
+                  : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
+              }`}
+            >
+              <ChannelIcon className="w-3.5 h-3.5" />
+              <span>{ch === 'all' ? 'All Channels' : ch}</span>
+            </button>
+          );
+        })}
       </div>
 
       {items.length === 0 ? (
@@ -79,11 +92,23 @@ export const NotificationsPage: React.FC = () => {
               }`}
             >
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 rounded-xl border border-slate-200 bg-slate-50 flex items-center justify-center text-teal-800 shrink-0">
-                  {n.channel === 'WhatsApp' ? (
+                <div
+                  className={`w-10 h-10 rounded-xl border flex items-center justify-center shrink-0 ${
+                    n.category === 'sos_alert'
+                      ? 'border-red-200 bg-red-50 text-red-600'
+                      : 'border-slate-200 bg-slate-50 text-teal-800'
+                  }`}
+                >
+                  {n.category === 'sos_alert' ? (
+                    <AlertTriangle className="w-4 h-4" />
+                  ) : n.category === 'photo_update' ? (
+                    <Camera className="w-4 h-4" />
+                  ) : n.category === 'rebook_nudge' ? (
+                    <RotateCcw className="w-4 h-4" />
+                  ) : n.category === 'holiday_reminder' ? (
+                    <Calendar className="w-4 h-4" />
+                  ) : n.channel === 'WhatsApp' ? (
                     <MessageCircle className="w-4 h-4" />
-                  ) : n.category === 'sos_alert' ? (
-                    <Bell className="w-4 h-4 text-red-600" />
                   ) : (
                     <Smartphone className="w-4 h-4" />
                   )}

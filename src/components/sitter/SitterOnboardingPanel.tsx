@@ -1,5 +1,14 @@
 import React, { useState } from 'react';
-import { CheckCircle2, FileCheck2, ShieldAlert, ShieldCheck, Upload } from 'lucide-react';
+import {
+  CheckCircle2,
+  FileCheck2,
+  Fingerprint,
+  HeartPulse,
+  ShieldAlert,
+  ShieldCheck,
+  Upload,
+  Video,
+} from 'lucide-react';
 import { useApp } from '../../state/AppContext';
 import { Sitter } from '../../types';
 
@@ -80,14 +89,19 @@ export const SitterOnboardingPanel: React.FC<{ sitter: Sitter }> = ({ sitter }) 
 
         <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl">
           <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-slate-900">
-                1. Singpass Identity & NRIC Verification
-              </p>
-              <p className="text-xs text-slate-600">
-                Masked NRIC stored: <span className="font-mono">{sitter.maskedNric}</span> ·
-                Residential address never exposed to parents.
-              </p>
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                <Fingerprint className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">
+                  1. Singpass Identity & NRIC Verification
+                </p>
+                <p className="text-xs text-slate-600">
+                  Masked NRIC stored: <span className="font-mono">{sitter.maskedNric}</span> ·
+                  Residential address never exposed to parents.
+                </p>
+              </div>
             </div>
             {docs.singpassIdentity === 'verified' ? (
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-800">
@@ -106,14 +120,19 @@ export const SitterOnboardingPanel: React.FC<{ sitter: Sitter }> = ({ sitter }) 
           </div>
 
           <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-slate-900">
-                2. Child First-Aid / CPR & AED Certificate
-              </p>
-              <p className="text-xs text-slate-600">
-                {certFileLabel}
-                {docs.firstAidExpiry ? ` · Valid until ${docs.firstAidExpiry}` : ''}
-              </p>
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                <HeartPulse className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">
+                  2. Child First-Aid / CPR & AED Certificate
+                </p>
+                <p className="text-xs text-slate-600">
+                  {certFileLabel}
+                  {docs.firstAidExpiry ? ` · Valid until ${docs.firstAidExpiry}` : ''}
+                </p>
+              </div>
             </div>
             <button
               type="button"
@@ -133,13 +152,18 @@ export const SitterOnboardingPanel: React.FC<{ sitter: Sitter }> = ({ sitter }) 
           </div>
 
           <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-slate-900">
-                3. In-Person / Video Caregiver Interview
-              </p>
-              <p className="text-xs text-slate-600">
-                Scenario screening for infant safety, allergy handling, and emergency response.
-              </p>
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                <Video className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">
+                  3. In-Person / Video Caregiver Interview
+                </p>
+                <p className="text-xs text-slate-600">
+                  Scenario screening for infant safety, allergy handling, and emergency response.
+                </p>
+              </div>
             </div>
             {docs.interviewStatus === 'completed' ? (
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-800">
@@ -158,14 +182,19 @@ export const SitterOnboardingPanel: React.FC<{ sitter: Sitter }> = ({ sitter }) 
           </div>
 
           <div className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-slate-900">
-                4. Service Agreement & Liability Waiver (Singpass Sign)
-              </p>
-              <p className="text-xs text-slate-600">
-                Covers platform code of conduct, PDPA child confidentiality, and booking insurance
-                terms.
-              </p>
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center shrink-0">
+                <FileCheck2 className="w-4 h-4" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold text-slate-900">
+                  4. Service Agreement & Liability Waiver (Singpass Sign)
+                </p>
+                <p className="text-xs text-slate-600">
+                  Covers platform code of conduct, PDPA child confidentiality, and booking insurance
+                  terms.
+                </p>
+              </div>
             </div>
             {docs.agreementSignedWithSingpass ? (
               <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-teal-800">

@@ -1,5 +1,16 @@
 import React from 'react';
-import { Bell, CalendarCheck, Crown, Search, ShieldCheck, Users } from 'lucide-react';
+import {
+  BarChart3,
+  Bell,
+  CalendarCheck,
+  Crown,
+  HeartHandshake,
+  Search,
+  ShieldAlert,
+  ShieldCheck,
+  Users,
+  Wallet,
+} from 'lucide-react';
 import { ActiveTab, useApp } from '../../state/AppContext';
 import { RoleMode } from '../../types';
 
@@ -21,14 +32,14 @@ const PARENT_NAV: NavItem[] = [
 const SITTER_NAV: NavItem[] = [
   { id: 'sitter_jobs', label: 'Jobs & Calendar', mobileLabel: 'Jobs', icon: CalendarCheck },
   { id: 'sitter_onboarding', label: 'Onboarding', mobileLabel: 'Verify', icon: ShieldCheck },
-  { id: 'sitter_earnings', label: 'Earnings', mobileLabel: 'Earnings', icon: Crown },
+  { id: 'sitter_earnings', label: 'Earnings', mobileLabel: 'Earnings', icon: Wallet },
   { id: 'notifications', label: 'Alerts', mobileLabel: 'Alerts', icon: Bell },
 ];
 
 const ADMIN_NAV: NavItem[] = [
-  { id: 'admin_overview', label: 'KPIs & Areas', mobileLabel: 'KPIs', icon: Search },
+  { id: 'admin_overview', label: 'KPIs & Areas', mobileLabel: 'KPIs', icon: BarChart3 },
   { id: 'admin_verifications', label: 'Verification Queue', mobileLabel: 'Verify', icon: ShieldCheck },
-  { id: 'admin_incidents', label: 'Trust & Safety', mobileLabel: 'Incidents', icon: Users },
+  { id: 'admin_incidents', label: 'Trust & Safety', mobileLabel: 'Incidents', icon: ShieldAlert },
   { id: 'notifications', label: 'Alert Feed', mobileLabel: 'Alerts', icon: Bell },
 ];
 
@@ -38,10 +49,14 @@ export const Header: React.FC = () => {
   const navItems =
     state.role === 'parent' ? PARENT_NAV : state.role === 'sitter' ? SITTER_NAV : ADMIN_NAV;
 
-  const roles: { id: RoleMode; label: string }[] = [
-    { id: 'parent', label: 'Parent' },
-    { id: 'sitter', label: 'Sitter' },
-    { id: 'admin', label: 'Admin' },
+  const roles: {
+    id: RoleMode;
+    label: string;
+    icon: React.ComponentType<{ className?: string }>;
+  }[] = [
+    { id: 'parent', label: 'Parent', icon: Users },
+    { id: 'sitter', label: 'Sitter', icon: HeartHandshake },
+    { id: 'admin', label: 'Admin', icon: ShieldCheck },
   ];
 
   return (
@@ -61,6 +76,7 @@ export const Header: React.FC = () => {
             className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600"
           >
             {navItems.map((item) => {
+              const Icon = item.icon;
               const isActive = state.activeTab === item.id;
               return (
                 <button
@@ -73,6 +89,7 @@ export const Header: React.FC = () => {
                       : 'hover:text-slate-900'
                   }`}
                 >
+                  <Icon className="w-4 h-4 shrink-0" />
                   <span>{item.label}</span>
                   {item.id === 'notifications' && unreadNotificationsCount > 0 && (
                     <span className="font-mono text-xs text-teal-800 tabular-nums">
@@ -90,19 +107,21 @@ export const Header: React.FC = () => {
             className="flex items-center p-1 bg-slate-100 border border-slate-200 rounded-xl shrink-0"
           >
             {roles.map((r) => {
+              const RoleIcon = r.icon;
               const active = state.role === r.id;
               return (
                 <button
                   key={r.id}
                   type="button"
                   onClick={() => setRole(r.id)}
-                  className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 min-h-[36px] sm:min-h-[34px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-700 ${
+                  className={`px-2.5 sm:px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors whitespace-nowrap shrink-0 min-h-[36px] sm:min-h-[34px] inline-flex items-center gap-1.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-700 ${
                     active
                       ? 'bg-white text-slate-900 shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  {r.label}
+                  <RoleIcon className="w-3.5 h-3.5 hidden sm:block shrink-0" />
+                  <span>{r.label}</span>
                 </button>
               );
             })}

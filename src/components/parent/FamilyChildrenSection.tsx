@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, UserPlus } from 'lucide-react';
+import { Baby, HeartHandshake, Trash2, UserPlus } from 'lucide-react';
 import { AgeBand, Child } from '../../types';
 
 const AGE_BANDS: AgeBand[] = [
@@ -62,27 +62,35 @@ export const FamilyChildrenSection: React.FC<Props> = ({
             key={child.id}
             className="rounded-xl border border-slate-200 p-4 flex items-start justify-between gap-3"
           >
-            <div className="space-y-1 text-sm">
-              <p className="font-bold text-slate-900">
-                {child.firstName} ·{' '}
-                <span className="font-medium text-teal-800">{child.ageBand}</span>
-              </p>
-              <p className="text-xs text-slate-600">
-                <span className="font-semibold text-slate-800">Allergies:</span> {child.allergies}
-              </p>
-              <p className="text-xs text-slate-600">
-                <span className="font-semibold text-slate-800">Dietary:</span> {child.dietaryNotes}
-              </p>
-              <p className="text-xs text-slate-600">
-                <span className="font-semibold text-slate-800">Cultural / Routine:</span>{' '}
-                {child.culturalNotes}
-              </p>
-              {child.specialNeedsFlag && (
-                <p className="text-xs font-semibold text-amber-800 pt-0.5">
-                  Special needs support requested
-                  {child.specialNeedsDetails ? `: ${child.specialNeedsDetails}` : ''}
+            <div className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-xl bg-teal-50 border border-teal-100 text-teal-700 flex items-center justify-center shrink-0 mt-0.5">
+                <Baby className="w-4 h-4" />
+              </div>
+              <div className="space-y-1 text-sm">
+                <p className="font-bold text-slate-900">
+                  {child.firstName} ·{' '}
+                  <span className="font-medium text-teal-800">{child.ageBand}</span>
                 </p>
-              )}
+                <p className="text-xs text-slate-600">
+                  <span className="font-semibold text-slate-800">Allergies:</span> {child.allergies}
+                </p>
+                <p className="text-xs text-slate-600">
+                  <span className="font-semibold text-slate-800">Dietary:</span> {child.dietaryNotes}
+                </p>
+                <p className="text-xs text-slate-600">
+                  <span className="font-semibold text-slate-800">Cultural / Routine:</span>{' '}
+                  {child.culturalNotes}
+                </p>
+                {child.specialNeedsFlag && (
+                  <p className="text-xs font-semibold text-amber-800 pt-0.5 inline-flex items-center gap-1.5">
+                    <HeartHandshake className="w-3.5 h-3.5 shrink-0" />
+                    <span>
+                      Special needs support requested
+                      {child.specialNeedsDetails ? `: ${child.specialNeedsDetails}` : ''}
+                    </span>
+                  </p>
+                )}
+              </div>
             </div>
             {childrenList.length > 1 && (
               <button
@@ -157,9 +165,10 @@ export const FamilyChildrenSection: React.FC<Props> = ({
           </label>
           <button
             type="submit"
-            className="min-h-[44px] px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold"
+            className="min-h-[44px] px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold inline-flex items-center gap-1.5"
           >
-            Add Child
+            <UserPlus className="w-4 h-4" />
+            <span>Add Child</span>
           </button>
         </div>
       </form>

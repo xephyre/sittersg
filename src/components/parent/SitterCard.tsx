@@ -1,5 +1,15 @@
 import React from 'react';
-import { BadgeCheck, Calendar, MapPin, ShieldCheck, Star } from 'lucide-react';
+import {
+  BadgeCheck,
+  Calendar,
+  Clock,
+  HeartPulse,
+  MapPin,
+  ShieldCheck,
+  Star,
+  User,
+  UserCheck,
+} from 'lucide-react';
 import { Sitter } from '../../types';
 import { SitterAvatar } from '../common/SitterAvatar';
 
@@ -47,27 +57,46 @@ export const SitterCard: React.FC<SitterCardProps> = ({
 
       <p className="text-sm text-slate-600 line-clamp-2 leading-relaxed">{sitter.bio}</p>
 
-      <p className="text-xs text-slate-500 leading-relaxed">
+      <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 text-xs text-slate-500 leading-relaxed">
         <span className="text-teal-800 font-medium inline-flex items-center gap-1">
-          <BadgeCheck className="w-3.5 h-3.5" />
-          Singpass ✓
+          <BadgeCheck className="w-3.5 h-3.5 shrink-0" />
+          Singpass
         </span>
-        {' · '}First-aid/CPR ✓{' · '}Interviewed ✓{' · '}
+        <span aria-hidden="true">·</span>
         <span className="inline-flex items-center gap-1">
-          <ShieldCheck className="w-3.5 h-3.5 text-teal-700" />
-          Insured ✓
+          <HeartPulse className="w-3.5 h-3.5 text-teal-700 shrink-0" />
+          First-aid/CPR
         </span>
-        {sitter.availableToday ? ' · Available today' : ''}
-      </p>
+        <span aria-hidden="true">·</span>
+        <span className="inline-flex items-center gap-1">
+          <UserCheck className="w-3.5 h-3.5 text-teal-700 shrink-0" />
+          Interviewed
+        </span>
+        <span aria-hidden="true">·</span>
+        <span className="inline-flex items-center gap-1">
+          <ShieldCheck className="w-3.5 h-3.5 text-teal-700 shrink-0" />
+          Insured
+        </span>
+        {sitter.availableToday && (
+          <>
+            <span aria-hidden="true">·</span>
+            <span className="inline-flex items-center gap-1 text-teal-800 font-medium">
+              <Clock className="w-3.5 h-3.5 shrink-0" />
+              Available today
+            </span>
+          </>
+        )}
+      </div>
     </div>
 
     <div className="flex items-center gap-2.5 pt-2 border-t border-slate-100">
       <button
         type="button"
         onClick={() => onViewProfile(sitter)}
-        className="flex-1 min-h-[44px] px-3 py-2 rounded-xl border border-slate-300 text-slate-800 text-xs font-semibold hover:bg-slate-50 transition-colors"
+        className="flex-1 min-h-[44px] px-3 py-2 rounded-xl border border-slate-300 text-slate-800 text-xs font-semibold hover:bg-slate-50 transition-colors inline-flex items-center justify-center gap-1.5"
       >
-        View Profile
+        <User className="w-3.5 h-3.5" />
+        <span>View Profile</span>
       </button>
       <button
         type="button"

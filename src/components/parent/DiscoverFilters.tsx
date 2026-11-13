@@ -1,5 +1,12 @@
 import React from 'react';
-import { MapPin, SlidersHorizontal } from 'lucide-react';
+import {
+  Baby,
+  Clock,
+  HeartHandshake,
+  LocateFixed,
+  MapPin,
+  SlidersHorizontal,
+} from 'lucide-react';
 import { ServiceType, SpokenLanguage } from '../../types';
 import { GeocodedLocation } from '../../services/interfaces';
 
@@ -118,9 +125,10 @@ export const DiscoverFilters: React.FC<DiscoverFiltersProps> = ({
           <button
             type="submit"
             disabled={lookupLoading}
-            className="min-h-[44px] px-3.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 whitespace-nowrap"
+            className="min-h-[44px] px-3.5 rounded-xl border border-slate-300 text-xs font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-50 whitespace-nowrap inline-flex items-center gap-1.5"
           >
-            {lookupLoading ? 'Looking up...' : 'Locate'}
+            <LocateFixed className="w-3.5 h-3.5 text-teal-700" />
+            <span>{lookupLoading ? 'Looking up...' : 'Locate'}</span>
           </button>
         </div>
       </form>
@@ -184,35 +192,38 @@ export const DiscoverFilters: React.FC<DiscoverFiltersProps> = ({
       <button
         type="button"
         onClick={() => setAvailableTodayOnly((v) => !v)}
-        className={`min-h-[40px] px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-colors ${
+        className={`min-h-[40px] px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-colors inline-flex items-center gap-1.5 ${
           availableTodayOnly
             ? 'bg-teal-700 border-teal-700 text-white'
             : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
         }`}
       >
-        Available today
+        <Clock className="w-3.5 h-3.5" />
+        <span>Available today</span>
       </button>
       <button
         type="button"
         onClick={() => setSpecialFilter((v) => (v === 'newborn' ? 'none' : 'newborn'))}
-        className={`min-h-[40px] px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-colors ${
+        className={`min-h-[40px] px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-colors inline-flex items-center gap-1.5 ${
           specialFilter === 'newborn'
             ? 'bg-teal-700 border-teal-700 text-white'
             : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
         }`}
       >
-        Newborn certified
+        <Baby className="w-3.5 h-3.5" />
+        <span>Newborn certified</span>
       </button>
       <button
         type="button"
         onClick={() => setSpecialFilter((v) => (v === 'special_needs' ? 'none' : 'special_needs'))}
-        className={`min-h-[40px] px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-colors ${
+        className={`min-h-[40px] px-3.5 py-1.5 rounded-xl border text-xs font-semibold transition-colors inline-flex items-center gap-1.5 ${
           specialFilter === 'special_needs'
             ? 'bg-teal-700 border-teal-700 text-white'
             : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
         }`}
       >
-        Special-needs trained
+        <HeartHandshake className="w-3.5 h-3.5" />
+        <span>Special-needs trained</span>
       </button>
       <select
         aria-label="Minimum rating"

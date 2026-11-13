@@ -1,5 +1,12 @@
 import React, { useState } from 'react';
-import { Camera, CheckCircle2 } from 'lucide-react';
+import {
+  BadgeCheck,
+  Camera,
+  CheckCircle2,
+  DoorOpen,
+  LogOut,
+  Navigation,
+} from 'lucide-react';
 import { Booking } from '../../types';
 
 interface Props {
@@ -12,12 +19,16 @@ interface Props {
   ) => Promise<void>;
 }
 
-const TIMELINE_STEPS: { key: Booking['timeline'][number]['step']; label: string }[] = [
-  { key: 'confirmed', label: 'Sitter confirmed' },
-  { key: 'on_the_way', label: 'On the way' },
-  { key: 'checked_in', label: 'Checked in' },
-  { key: 'photo_update', label: 'Photo update' },
-  { key: 'checked_out', label: 'Checked out' },
+const TIMELINE_STEPS: {
+  key: Booking['timeline'][number]['step'];
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+}[] = [
+  { key: 'confirmed', label: 'Sitter confirmed', icon: BadgeCheck },
+  { key: 'on_the_way', label: 'On the way', icon: Navigation },
+  { key: 'checked_in', label: 'Checked in', icon: DoorOpen },
+  { key: 'photo_update', label: 'Photo update', icon: Camera },
+  { key: 'checked_out', label: 'Checked out', icon: CheckCircle2 },
 ];
 
 export const BookingTimelineCard: React.FC<Props> = ({
@@ -60,9 +71,10 @@ export const BookingTimelineCard: React.FC<Props> = ({
                   onClick={() =>
                     onAdvanceStep(booking.id, 'on_the_way', 'Sitter departed via MRT/LRT.')
                   }
-                  className="min-h-[36px] px-3 py-1 rounded-lg border border-slate-300 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                  className="min-h-[36px] px-3 py-1 rounded-lg border border-slate-300 text-xs font-medium text-slate-700 hover:bg-slate-50 inline-flex items-center gap-1.5"
                 >
-                  Simulate: On the way
+                  <Navigation className="w-3.5 h-3.5 text-teal-700" />
+                  <span>Simulate: On the way</span>
                 </button>
               )}
               {booking.status === 'on_the_way' && (
@@ -71,9 +83,10 @@ export const BookingTimelineCard: React.FC<Props> = ({
                   onClick={() =>
                     onAdvanceStep(booking.id, 'checked_in', 'Arrived safely at family unit.')
                   }
-                  className="min-h-[36px] px-3 py-1 rounded-lg border border-slate-300 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                  className="min-h-[36px] px-3 py-1 rounded-lg border border-slate-300 text-xs font-medium text-slate-700 hover:bg-slate-50 inline-flex items-center gap-1.5"
                 >
-                  Simulate: Check in
+                  <DoorOpen className="w-3.5 h-3.5 text-teal-700" />
+                  <span>Simulate: Check in</span>
                 </button>
               )}
               {booking.status === 'checked_in' && (
@@ -87,9 +100,10 @@ export const BookingTimelineCard: React.FC<Props> = ({
                         'Calm reading & block play before bedtime!'
                       )
                     }
-                    className="min-h-[36px] px-3 py-1 rounded-lg border border-slate-300 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                    className="min-h-[36px] px-3 py-1 rounded-lg border border-slate-300 text-xs font-medium text-slate-700 hover:bg-slate-50 inline-flex items-center gap-1.5"
                   >
-                    Simulate: Photo update
+                    <Camera className="w-3.5 h-3.5 text-teal-700" />
+                    <span>Simulate: Photo update</span>
                   </button>
                   <button
                     type="button"
@@ -100,9 +114,10 @@ export const BookingTimelineCard: React.FC<Props> = ({
                         'Parent returned home; handover complete.'
                       )
                     }
-                    className="min-h-[36px] px-3 py-1 rounded-lg border border-teal-700 text-xs font-semibold text-teal-800 hover:bg-teal-50"
+                    className="min-h-[36px] px-3 py-1 rounded-lg border border-teal-700 text-xs font-semibold text-teal-800 hover:bg-teal-50 inline-flex items-center gap-1.5"
                   >
-                    Simulate: Check out
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>Simulate: Check out</span>
                   </button>
                 </>
               )}
@@ -112,6 +127,7 @@ export const BookingTimelineCard: React.FC<Props> = ({
 
         <ol className="space-y-3">
           {TIMELINE_STEPS.map((stepDef) => {
+            const StepIcon = stepDef.icon;
             const matched = [...booking.timeline].reverse().find((e) => e.step === stepDef.key);
             return (
               <li
@@ -127,11 +143,7 @@ export const BookingTimelineCard: React.FC<Props> = ({
                     matched ? 'bg-teal-700 text-white' : 'bg-slate-200 text-slate-500'
                   }`}
                 >
-                  {stepDef.key === 'photo_update' ? (
-                    <Camera className="w-3.5 h-3.5" />
-                  ) : (
-                    <CheckCircle2 className="w-3.5 h-3.5" />
-                  )}
+                  <StepIcon className="w-3.5 h-3.5" />
                 </div>
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-center justify-between gap-2">

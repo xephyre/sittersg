@@ -1,5 +1,16 @@
 import React, { useState } from 'react';
-import { Calendar, Camera, CheckCircle2, Lock, Send } from 'lucide-react';
+import {
+  Calendar,
+  Camera,
+  CheckCircle2,
+  Lock,
+  LogOut,
+  MapPin,
+  Navigation,
+  Power,
+  Send,
+  XCircle,
+} from 'lucide-react';
 import { useApp } from '../../state/AppContext';
 import { SitterAvatar } from '../common/SitterAvatar';
 import { SitterOnboardingPanel } from './SitterOnboardingPanel';
@@ -46,13 +57,16 @@ export const SitterAppPage: React.FC = () => {
         <button
           type="button"
           onClick={() => toggleSitterAvailableToday(activeSitter.id)}
-          className={`min-h-[44px] px-4 py-2 rounded-xl border text-xs font-semibold transition-colors whitespace-nowrap ${
+          className={`min-h-[44px] px-4 py-2 rounded-xl border text-xs font-semibold transition-colors whitespace-nowrap inline-flex items-center gap-1.5 ${
             activeSitter.availableToday
               ? 'bg-teal-700 border-teal-700 text-white'
               : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
           }`}
         >
-          {activeSitter.availableToday ? 'Available Today: ON' : 'Available Today: OFF'}
+          <Power className="w-3.5 h-3.5" />
+          <span>
+            {activeSitter.availableToday ? 'Available Today: ON' : 'Available Today: OFF'}
+          </span>
         </button>
       </section>
 
@@ -104,8 +118,11 @@ export const SitterAppPage: React.FC = () => {
                       </span>
                     </p>
                   ) : (
-                    <p className="text-slate-800">
-                      <strong>Confirmed Family Address:</strong> {b.parentFullAddress}
+                    <p className="text-slate-800 flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-teal-700 shrink-0" />
+                      <span>
+                        <strong>Confirmed Family Address:</strong> {b.parentFullAddress}
+                      </span>
                     </p>
                   )}
                   <p className="text-slate-600">
@@ -124,16 +141,18 @@ export const SitterAppPage: React.FC = () => {
                           `${activeSitter.displayName} accepted booking.`
                         )
                       }
-                      className="min-h-[44px] px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold"
+                      className="min-h-[44px] px-5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-semibold inline-flex items-center gap-1.5"
                     >
-                      Accept Job (Unlock Address)
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Accept Job (Unlock Address)</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => declineBooking(b.id)}
-                      className="min-h-[44px] px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-50"
+                      className="min-h-[44px] px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-50 inline-flex items-center gap-1.5"
                     >
-                      Decline
+                      <XCircle className="w-3.5 h-3.5" />
+                      <span>Decline</span>
                     </button>
                   </div>
                 )}
@@ -147,9 +166,10 @@ export const SitterAppPage: React.FC = () => {
                           onClick={() =>
                             advanceBookingStep(b.id, 'on_the_way', 'On the way to family home.')
                           }
-                          className="min-h-[44px] px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold"
+                          className="min-h-[44px] px-4 py-2 rounded-xl bg-slate-900 text-white text-xs font-semibold inline-flex items-center gap-1.5"
                         >
-                          Mark On the Way
+                          <Navigation className="w-3.5 h-3.5" />
+                          <span>Mark On the Way</span>
                         </button>
                       )}
                       {(b.status === 'confirmed' || b.status === 'on_the_way') && (
@@ -185,9 +205,10 @@ export const SitterAppPage: React.FC = () => {
                             onClick={() =>
                               advanceBookingStep(b.id, 'checked_out', 'Handover completed cleanly.')
                             }
-                            className="min-h-[44px] px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold"
+                            className="min-h-[44px] px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold inline-flex items-center gap-1.5"
                           >
-                            Check Out
+                            <LogOut className="w-3.5 h-3.5" />
+                            <span>Check Out</span>
                           </button>
                         </>
                       )}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Phone, Plus, ShieldCheck } from 'lucide-react';
+import { KeyRound, MapPin, Phone, PhoneCall, Plus, ShieldCheck } from 'lucide-react';
 import { useApp } from '../../state/AppContext';
 import { EstateArea } from '../../types';
 import { FamilyChildrenSection } from './FamilyChildrenSection';
@@ -56,9 +56,10 @@ export const FamilyProfilePage: React.FC = () => {
         <button
           type="button"
           onClick={() => setSingpassModalOpen(true)}
-          className="min-h-[44px] px-4 py-2 rounded-xl bg-red-700 hover:bg-red-800 text-white text-xs font-semibold whitespace-nowrap shrink-0"
+          className="min-h-[44px] px-4 py-2 rounded-xl bg-red-700 hover:bg-red-800 text-white text-xs font-semibold whitespace-nowrap shrink-0 inline-flex items-center gap-2"
         >
-          Re-sync with Singpass MyInfo
+          <KeyRound className="w-4 h-4" />
+          <span>Re-sync with Singpass MyInfo</span>
         </button>
       </div>
 
@@ -134,17 +135,19 @@ export const FamilyProfilePage: React.FC = () => {
             </div>
             <button
               type="submit"
-              className="min-h-[44px] px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold"
+              className="min-h-[44px] px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold inline-flex items-center gap-1.5"
             >
-              Save Home Address
+              <MapPin className="w-3.5 h-3.5" />
+              <span>Save Home Address</span>
             </button>
             {savedNotice && <p className="text-xs text-teal-800 font-medium">{savedNotice}</p>}
           </form>
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 sm:p-6 space-y-4">
-          <h2 className="text-base font-bold text-slate-900">
-            Emergency Contacts ({activeParent.emergencyContacts.length})
+          <h2 className="text-base font-bold text-slate-900 flex items-center gap-2">
+            <PhoneCall className="w-4 h-4 text-teal-700" />
+            <span>Emergency Contacts ({activeParent.emergencyContacts.length})</span>
           </h2>
           <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl">
             {activeParent.emergencyContacts.map((ec) => (

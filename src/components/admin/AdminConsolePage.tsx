@@ -1,5 +1,14 @@
 import React from 'react';
-import { MapPin, ShieldCheck } from 'lucide-react';
+import {
+  Banknote,
+  CalendarCheck,
+  Clock,
+  MapPin,
+  Repeat,
+  ShieldAlert,
+  ShieldCheck,
+  Star,
+} from 'lucide-react';
 import { useApp } from '../../state/AppContext';
 import { EstateArea } from '../../types';
 import { AdminVerificationQueue } from './AdminVerificationQueue';
@@ -62,47 +71,64 @@ export const AdminConsolePage: React.FC = () => {
           <button
             type="button"
             onClick={() => setActiveTab('admin_verifications')}
-            className="min-h-[44px] px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 whitespace-nowrap"
+            className="min-h-[44px] px-4 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-xs font-semibold text-slate-800 whitespace-nowrap inline-flex items-center gap-1.5"
           >
-            Verification Queue ({pendingSitters.length})
+            <ShieldCheck className="w-4 h-4 text-teal-700" />
+            <span>Verification Queue ({pendingSitters.length})</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveTab('admin_incidents')}
-            className="min-h-[44px] px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold whitespace-nowrap"
+            className="min-h-[44px] px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold whitespace-nowrap inline-flex items-center gap-1.5"
           >
-            Incidents ({openIncidents} open)
+            <ShieldAlert className="w-4 h-4" />
+            <span>Incidents ({openIncidents} open)</span>
           </button>
         </div>
       </div>
 
       <section className="grid grid-cols-2 lg:grid-cols-5 gap-4">
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <p className="text-xs text-slate-500">Total Bookings</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-slate-500">Total Bookings</p>
+            <CalendarCheck className="w-4 h-4 text-slate-400" />
+          </div>
           <p className="text-2xl font-bold font-mono text-slate-900 tabular-nums mt-1">
             {totalBookings}
           </p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <p className="text-xs text-slate-500">Gross Booking Value</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-slate-500">Gross Booking Value</p>
+            <Banknote className="w-4 h-4 text-slate-400" />
+          </div>
           <p className="text-2xl font-bold font-mono text-slate-900 tabular-nums mt-1">
             S${gbv.toFixed(0)}
           </p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <p className="text-xs text-slate-500">Repeat-Booking Rate</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-slate-500">Repeat-Booking Rate</p>
+            <Repeat className="w-4 h-4 text-teal-700" />
+          </div>
           <p className="text-2xl font-bold font-mono text-teal-800 tabular-nums mt-1">
             {repeatRate}%
           </p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <p className="text-xs text-slate-500">Average Rating</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-slate-500">Average Rating</p>
+            <Star className="w-4 h-4 fill-amber-400 text-amber-500" />
+          </div>
           <p className="text-2xl font-bold font-mono text-slate-900 tabular-nums mt-1">
             {avgRating.toFixed(2)}★
           </p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5 col-span-2 lg:col-span-1">
-          <p className="text-xs text-slate-500">Confirmed Within 24h</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-slate-500">Confirmed Within 24h</p>
+            <Clock className="w-4 h-4 text-teal-700" />
+          </div>
           <p className="text-2xl font-bold font-mono text-teal-800 tabular-nums mt-1">
             {confirmed24hPct}%
           </p>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { DollarSign } from 'lucide-react';
+import { Clock, DollarSign, Users, Wallet } from 'lucide-react';
 import { Booking, Sitter } from '../../types';
 
 interface Props {
@@ -26,19 +26,28 @@ export const SitterEarningsPanel: React.FC<Props> = ({ activeSitter, sitterBooki
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <p className="text-xs text-slate-500">Completed Payouts</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-slate-500">Completed Payouts</p>
+            <Wallet className="w-4 h-4 text-teal-700" />
+          </div>
           <p className="text-2xl font-bold font-mono text-slate-900 tabular-nums mt-1">
             S${totalNetEarnings.toFixed(2)}
           </p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <p className="text-xs text-slate-500">Upcoming / Active Escrow</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-slate-500">Upcoming / Active Escrow</p>
+            <Clock className="w-4 h-4 text-teal-700" />
+          </div>
           <p className="text-2xl font-bold font-mono text-teal-800 tabular-nums mt-1">
             S${pendingPayout.toFixed(2)}
           </p>
         </div>
         <div className="rounded-2xl border border-slate-200 bg-white p-5">
-          <p className="text-xs text-slate-500">Repeat Families</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-slate-500">Repeat Families</p>
+            <Users className="w-4 h-4 text-teal-700" />
+          </div>
           <p className="text-2xl font-bold font-mono text-slate-900 tabular-nums mt-1">
             {activeSitter.repeatFamilyCount}
           </p>

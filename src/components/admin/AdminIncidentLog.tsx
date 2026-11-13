@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertCircle, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
 import { useApp } from '../../state/AppContext';
 import { Incident } from '../../types';
 
@@ -71,20 +71,25 @@ export const AdminIncidentLog: React.FC = () => {
                   className="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm"
                 />
                 <div className="flex flex-wrap gap-2">
-                  {(['open', 'investigating', 'resolved'] as Incident['status'][]).map((st) => (
-                    <button
-                      key={st}
-                      type="button"
-                      onClick={() => adminUpdateIncident(inc.id, st, notesVal)}
-                      className={`min-h-[40px] px-3.5 py-1.5 rounded-xl border text-xs font-semibold capitalize transition-colors ${
-                        inc.status === st
-                          ? 'bg-slate-900 border-slate-900 text-white'
-                          : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
-                      }`}
-                    >
-                      Mark {st}
-                    </button>
-                  ))}
+                  {(['open', 'investigating', 'resolved'] as Incident['status'][]).map((st) => {
+                    const StatusIcon =
+                      st === 'open' ? AlertCircle : st === 'investigating' ? Clock : CheckCircle2;
+                    return (
+                      <button
+                        key={st}
+                        type="button"
+                        onClick={() => adminUpdateIncident(inc.id, st, notesVal)}
+                        className={`min-h-[40px] px-3.5 py-1.5 rounded-xl border text-xs font-semibold capitalize transition-colors inline-flex items-center gap-1.5 ${
+                          inc.status === st
+                            ? 'bg-slate-900 border-slate-900 text-white'
+                            : 'bg-white border-slate-300 text-slate-700 hover:bg-slate-50'
+                        }`}
+                      >
+                        <StatusIcon className="w-3.5 h-3.5" />
+                        <span>Mark {st}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </article>
